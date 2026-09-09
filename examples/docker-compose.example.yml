@@ -1,0 +1,30 @@
+# Sanitized local demonstration only.
+# This is not the production CirroCore Compose configuration.
+
+services:
+  healthcheck-demo:
+    image: node:22-alpine
+    user: node
+    working_dir: /app
+    command: ["node", "healthcheck-example.js"]
+    environment:
+      PORT: "8080"
+    volumes:
+      - ./healthcheck-example.js:/app/healthcheck-example.js:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    mem_limit: 256m
+    cpus: 0.25
+    restart: unless-stopped
